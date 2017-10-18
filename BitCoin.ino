@@ -1,7 +1,7 @@
 /****************************
 Name:         Seamus de Cleir
 Date:         18/10/2017
-Description:  This program uses the ESP2866 and MAX2719 to display current Bitcoin 
+Description:  This program uses the ESP2866 and MAX2719 to display current Bitcoin
               prices every 12 hours.
 License:      MIT License
 ******************************/
@@ -17,18 +17,18 @@ License:      MIT License
 // Coin Desk website
 #define COIN_DESK "api.coindesk.com"
 
-// Wifi Login in 
-const char* ssid     = "IP_Freely";
-const char* password = "Finn@Matt@Patrick56";
+// Wifi Login in
+const char* ssid     = "your_ssid";
+const char* password = "your_password";
 
 // Times for delay
 const unsigned long SECOND = 1000;
 const unsigned long HOUR = 3600*SECOND;
 
 // GPIO pins used mapped for the NodeMCU ESP8266 version 2
-// pin D5 is connected to the DataIn 
-// pin D7 is connected to the CLK 
-// pin D6 is connected to LOAD 
+// pin D5 is connected to the DataIn
+// pin D7 is connected to the CLK
+// pin D6 is connected to LOAD
 LedControl lc=LedControl(D5,D7,D6,1);
 
 void setup()
@@ -43,16 +43,16 @@ void setup()
 
   // Connects to wifi
   WiFi.begin(ssid, password);
-  
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  
-  Serial.println("WiFi connected");  
+
+  Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
-  
+
 }
 
 // Used to store the JSON file from Coin Base
@@ -66,8 +66,8 @@ void loop()
   // Connect through port 443
   const int httpsPort = 443;
   const char* fingerprint = "CF 05 98 89 CA FF 8E D8 5E 5C E0 C2 E4 F7 E6 C3 C7 50 DD 5C";
-  
-  
+
+
   // Use WiFiClientSecure class to create TLS connection
   WiFiClientSecure httpclient;
   Serial.print("connecting to ");
@@ -76,7 +76,7 @@ void loop()
     Serial.println("connection failed");
     return;
   }
-  
+
   // Requests URL data
   httpclient.print(String("GET ") + "/v1/bpi/currentprice.json" + " HTTP/1.1\r\n" +
                "Host: " + COIN_DESK + "\r\n" +
@@ -114,10 +114,10 @@ void loop()
     delay(1);
   }
   httpclient.stop();
-  
+
   // Switches the LED screen on
   lc.shutdown(0, false);
-  
+
   // Starts the showBitcoinPrice function
   showBitcoinPrice(jsonBuf);
 
@@ -131,13 +131,13 @@ bool showBitcoinPrice(char *json)
 
   // Skip characters until first '{' found
   char *jsonStart = strchr(json, '{');
-  
+
   // Checks to see if jsonStart is empty
   if (jsonStart == NULL) {
     Serial.println(F("JSON data missing"));
     return false;
   }
-  
+
   json = jsonStart;
 
   // Parse json file
@@ -152,16 +152,16 @@ bool showBitcoinPrice(char *json)
   // Extracts the data in Euros
   String bitcoin = root["bpi"]["EUR"]["rate_float"];
   Serial.println(bitcoin);
-  
+
   // Prints to screen
   for(int i = 0;i < bitcoin.length(); i++) {
-      
+
       // Breaks if we reach a decimal point (bit lazy)
       if(bitcoin[i]=='.'){break;}
-      
+
       lc.setChar(0, 7-i, bitcoin[i], false);
     }
-  
+
 
   return true;
 }
