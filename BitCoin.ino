@@ -1,7 +1,7 @@
 /****************************
 Name:         Seamus de Cleir
 Date:         18/10/2017
-Description:  This program uses the ESP2866 and MAX2719 to display current Bitcoin
+Description:  This program uses the ESP2866 and MAX7219 to display current Bitcoin
               prices every 12 hours.
 License:      MIT License
 ******************************/
